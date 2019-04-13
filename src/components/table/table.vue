@@ -761,9 +761,13 @@
                 this.rebuildData = filterData;
                 this.$emit('on-filter-change', this.cloneColumns[index]);
             },
-            // 1. 深拷贝了一份data (prop)数据;
-            // 2. 遍历给每项数据 添加 属性_index (0开始自增) 和 属性_rowKey (1开始自增);
-            // 3. 返回 data；
+            /**
+             * 
+             * 1. 深拷贝了一份data (prop)数据;
+             * 2. 遍历给每项数据 添加 属性_index (0开始自增) 和 属性_rowKey (1开始自增);
+             * 
+             * @return data
+             */
             makeData () {
                 let data = deepCopy(this.data);
                 data.forEach((row, index) => {
@@ -772,6 +776,23 @@
                 });
                 return data;
             },
+            /**
+             * @@ 给列表进行排序
+             * 
+             * 1. 定义个变量 data 用来保存，经过遍历 对其进行添加了 属性_index (0开始自增) 和 属性_rowKey (1开始自增) 的数组；
+             * 
+             * 2. 预先定义三个变量
+             *            sortType(用来保存 最先遍历到 属性值不为 normal的带有 _sortType 属性的值)、
+             *            sortIndex(用来保存 最先遍历到 属性值不为 normal的带有 _sortType 属性的索引)、
+             *            isCustom(最先遍历到 属性_sortType 值不为 normal的列, 保存的指为 该列的 sortable 是否等于 'custom')
+             * 
+             * 3. 进行 for循环遍历，找到最先  _sortType 指不为 normal ，然后对以上三个变量进行赋值，跳出循环
+             * 
+             * 4. 进行判断  sortType !== 'normal' 并且 并且不是自定义的，就走系统的排序函数，然后返回排序过后的数据
+             *    否则 不进行排序处理，直接返回 data;
+             * 
+             * @return data；
+             */
             makeDataWithSort () {
                 let data = this.makeData();
                 let sortType = 'normal';
@@ -844,8 +865,8 @@
                     return item;
                 });
             },
-            // @@ 递归铺平对象 [getAllColumns]
             /*
+                * @@ 递归铺平对象
                 * getAllColumns 铺平多层嵌套 带有children属性
 
                 1. 深拷贝一份 被铺平列的数据
@@ -936,6 +957,7 @@
         },
         created () {
             if (!this.context) this.currentContext = this.$parent;
+            // 判断是否显示 slot，通过this.$slots.header 引用来判断，不用再传多余的属性
             this.showSlotHeader = this.$slots.header !== undefined;
             this.showSlotFooter = this.$slots.footer !== undefined;
             this.rebuildData = this.makeDataWithSortAndFilter();
