@@ -659,6 +659,26 @@
                     $body.scrollLeft = $body.scrollLeft - 10;
                 }
             },
+            /**
+             * @@ 返回经过排序后的data
+             * 
+             * @param data<Array> 经过遍历添加 _index (0开始自增) 和 _rowKey (1开始自增) 的数组
+             * @param type<String> 经过遍历找到的最先设置过且值不为 normal的列的 sortType  的值
+             * @param index<Number> 经过遍历找到的最先设置过且值不为 normal的列的 sortType所在列的 索引值
+             * 
+             * 1. 找到对应索引的key的值
+             * 2. 进行数组的sort方法进行排序（data每项是对象）
+             *      判断索引列是否定义了 sortMethod 方法，
+             *          定义过则调用自定义的sortMethod方法
+             *          没有则：判断 type 值是否为 'asc'，
+             *                  如果为 ‘asc’， 则进行生序排列
+             *                  否则为 ‘desc'，则进行倒叙排列
+             * 
+             *  3. sort 排序函数排序比对经常使用 reutrn a - b；这里使用 a > b ? 1 : -1;  a - b 有兼容性问题;
+             *     [https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Description]
+             * 
+             * @return data<Array> 经过排序过后的data
+             */
             sortData (data, type, index) {
                 const key = this.cloneColumns[index].key;
                 data.sort((a, b) => {
@@ -815,6 +835,9 @@
                 this.cloneColumns.forEach(col => data = this.filterData(data, col));
                 return data;
             },
+            /**
+             * @@ 对数据 先进行排序， 再进行过滤， 最后再返回data数据
+             */
             makeDataWithSortAndFilter () {
                 let data = this.makeDataWithSort();
                 this.cloneColumns.forEach(col => data = this.filterData(data, col));
